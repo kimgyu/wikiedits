@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from wiki.revision_iterator import RevisionIterator
+from wikiedits.wiki.revision_iterator import RevisionIterator
 from wikiedits.edit_extractor import EditExtractor
 
 class WikiEditExtractor(object):
 
     def __init__(self, filename, **kwargs):
-        self.revision = RevisionIterator(filename, kwargs['lang'])
+        self.revision = RevisionIterator(filename, **kwargs)
         self.extractor = EditExtractor(**kwargs)
 
     def extract_edits(self):

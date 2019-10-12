@@ -3,16 +3,16 @@
 from wikiedits.wiki.wiki_dump_parser import WikiDumpParser
 from wikiedits.wiki import VANDALISM_REGEXES
 
-import WikiExtractor
+from wikiedits.wiki import WikiExtractor
 import re
 
 HTML_TAG_REGEX = r'<[^>]{1,20}?>'
 
 class RevisionIterator(object):
 
-    def __init__(self, filename, lang='english'):
+    def __init__(self, filename, **kwargs):
         self.dump = WikiDumpParser(filename)
-        self.vandalism_regex = re.compile(VANDALISM_REGEXES[lang],
+        self.vandalism_regex = re.compile(VANDALISM_REGEXES[kwargs['lang']],
                                           re.IGNORECASE)
 
     def adjacent_revisions(self):

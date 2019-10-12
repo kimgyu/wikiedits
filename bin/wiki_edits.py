@@ -6,6 +6,7 @@ import os
 import argparse
 import logging
 import yaml
+import datetime
 
 # it may be required if you have installed NLTK locally
 #import nltk.data
@@ -21,20 +22,25 @@ def main():
     args = parse_user_args()
 
     if args.debug:
-        set_logging_level('debug')
+        set_logging_level('critical')
 
-    wiki = WikiEditExtractor(args.input or sys.stdin,
+    input_p = args.input or sys.stdin
+    wiki = WikiEditExtractor(input_p,
                              lang=args.language,
                              min_words=args.min_words,
                              max_words=args.max_words,
                              length_diff=args.length_diff,
-                             edit_ratio=args.edit_ratio,
-                             min_chars=args.min_chars)
+                             edit_ratio_max=args.edit_ratio_max,
+                             edit_ratio_min=args.edit_ratio_min,
+                             min_chars=args.min_chars,
+                             )
 
     if args.tabify:
-        output = "{old}\t{new}\n"
+        output = "{old}\t{new}"
         if args.scores:
             output += "\t{dist}\t{ratio}\n"
+        else :
+            output +='\n'
     else:
         output = "{old}\n{new}\n\n"
         if args.scores:
@@ -42,21 +48,25 @@ def main():
                    + output
 
     out = args.output
+
     if args.output != sys.stdout:
-        out = open(args.output, 'w')
+        out = open(args.output, 'w', encoding='utf-8')
 
     for edits, meta in wiki.extract_edits():
         if args.meta_data and edits:
             out.write(format_meta_data(meta) + "\n")
 
         for (old_edit, new_edit, scores) in edits:
-            out.write(output.format(old=old_edit.encode('utf-8'),
-                      new=new_edit.encode('utf-8'),
-                      ratio=scores[0],
-                      dist=scores[1]))
+            line = output.format(old=old_edit,
+                                    new=new_edit,
+                                    ratio=scores[0],
+                                    dist=scores[1])
+            out.write(line)
 
     if args.output != sys.stdout:
         out.close()
+
+    print("finding edit ended")
 
 def format_meta_data(data):
     lines = ["### %s" % line
@@ -65,6 +75,8 @@ def format_meta_data(data):
     return '\n'.join(lines)
 
 def parse_user_args():
+    dt = datetime.datetime.today()
+
     parser = argparse.ArgumentParser(
         description="Extracts edited text fragments from Wikipedia revisions.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -84,7 +96,7 @@ def parse_user_args():
                         help="turn on debug mode")
 
     group = parser.add_argument_group("selection options")
-    group.add_argument("-l", "--language", default="english",
+    group.add_argument("-l", "--language", default="korean",
                        help="specify language of NLTK sentence splitter",
                        choices=LANGUAGES)
     group.add_argument("--min-chars", type=int, default=10,
@@ -97,15 +109,23 @@ def parse_user_args():
     group.add_argument("--length-diff", type=int, default=4,
                        help="set maximum difference in length between " \
                             "edited sentences")
-    group.add_argument("--edit-ratio", type=float, default=0.3,
+    group.add_argument("--edit-ratio-max", type=float, default=0.3,
                        help="set maximum relative difference in edit " \
                             "distance")
+    group.add_argument("--edit-ratio-min", type=float, default=0.0001,
+                       help="set maximum relative difference in edit " \
+                            "distance")
+    group.add_argument('--default-output', default='wikiedit-{}.out'.format(dt.strftime('%Y-%m-%d-%X')),
+                       help='make output to default output'
+                       )
 
     args = parser.parse_args()
     if args.input == "<STDIN>":
         args.input = sys.stdin
     if args.output == "<STDOUT>":
         args.output = sys.stdout
+    if args.default_output :
+        args.output = args.default_output
     return args
 
 def set_logging_level(log_level):

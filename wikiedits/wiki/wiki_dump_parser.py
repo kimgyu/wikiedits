@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from lxml import etree
-import sys
 
 class WikiDumpParser(object):
 
@@ -14,14 +13,13 @@ class WikiDumpParser(object):
 
     def rev_iter(self):
         revision, page, contributor = {}, {}, {}
-
         for elem in self.__fast_iter():
             tag = self.__extract_tag(elem)
 
             if tag == 'id':
-                if 'id' not in page: # page id
+                if not revision: # page id
                     page['id'] = elem.text
-                elif 'id' not in revision: # revision id
+                if tag not in revision: # revision id
                     revision['id'] = elem.text
                 else: # user id
                     contributor['id'] = elem.text
@@ -63,8 +61,7 @@ class WikiDumpParser(object):
                 while elem.getprevious() is not None:
                     del elem.getparent()[0]
         except etree.LxmlError as ex:
-            print >>sys.stderr, "Iteration stopped due to lxml exception: {}" \
-                .format(ex)
+            print("Iteration stopped due to lxml exception: {}|{}" .format(type(ex),ex))
         finally:
             del self.context
 

@@ -61,7 +61,8 @@ import urllib
 import re
 import bz2
 import os.path
-from htmlentitydefs import name2codepoint
+# from htmlentitydefs import name2codepoint
+from html.entities import name2codepoint
 
 ### PARAMS ####################################################################
 
@@ -198,11 +199,11 @@ def unescape(text):
         try:
             if text[1] == "#":  # character reference
                 if text[2] == "x":
-                    return unichr(int(code[1:], 16))
+                    return chr(int(code[1:], 16))
                 else:
-                    return unichr(int(code))
+                    return chr(int(code))
             else:               # named entity
-                return unichr(name2codepoint[code])
+                return chr(name2codepoint[code])
         except:
             return text # leave as is
 
@@ -464,9 +465,13 @@ def compact(text):
                 title += '.'
             headers[lev] = title
             # drop previous headers
+            # don't del during iteration
+            del_target = []
             for i in headers.keys():
                 if i > lev:
-                    del headers[i]
+                    del_target.append(i)
+            for t in del_target :
+                del headers[t]
             emptySection = True
             continue
         # Handle page title
@@ -490,7 +495,10 @@ def compact(text):
             continue
         elif len(headers):
             items = headers.items()
-            items.sort()
+            # python 3
+            items = sorted(items, key=lambda k:k[0])
+            # python 2 ?
+            # items.sort()
             for (i, v) in items:
                 page.append(v)
             headers.clear()
@@ -504,7 +512,7 @@ def compact(text):
 def handle_unicode(entity):
     numeric_code = int(entity[2:-1])
     if numeric_code >= 0x10000: return ''
-    return unichr(numeric_code)
+    return chr(numeric_code)
 
 #------------------------------------------------------------------------------
 
@@ -594,7 +602,7 @@ def process_data(input, output):
             colon = title.find(':')
             if (colon < 0 or title[:colon] in acceptedNamespaces) and \
                     not redirect:
-                print id, title.encode('utf-8')
+                print(id, title.encode('utf-8'))
                 sys.stdout.flush()
                 WikiDocument(output, id, title, ''.join(page))
             id = None
@@ -662,7 +670,7 @@ def main():
         elif opt in ('-o', '--output'):
                 output_dir = arg
         elif opt in ('-v', '--version'):
-                print 'WikiExtractor.py version:', version
+                print ( 'WikiExtractor.py version:', version )
                 sys.exit(0)
 
     if len(args) > 0:

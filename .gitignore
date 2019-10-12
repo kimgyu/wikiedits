@@ -35,3 +35,7 @@ pip-delete-this-directory.txt
 .cache
 nosetests.xml
 coverage.xml
+
+# data or outputs
+*.xml
+*.out
