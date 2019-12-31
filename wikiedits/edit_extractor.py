@@ -16,7 +16,6 @@ class PreProcessor(object):
         tmp = re.sub(r'\([^)]*\)', '', text)
         #korean characters, digits, \., \,
         tmp = re.sub(r'[^ \u3131-\u3163\uac00-\ud7a3\d\.\,]+','', tmp)
-        tmp = re.sub(r'(\d+)','쉟', tmp)
         tmp = re.sub(r' {2,}',' ',tmp)
         return tmp
 

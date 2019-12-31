@@ -2,14 +2,18 @@
 
 from wikiedits.diff_finder import DiffFinder
 
-import nltk.data
-import Levenshtein
 import math
+import os
+import re
 
 import sentencepiece as sp
-import os
+import nltk.data
+import Levenshtein
+
 import logging
 log = logging.getLogger(__name__)
+
+import wikiedits.levenshtein as custome_lev
 
 class Tokenizer(object):
     '''
@@ -58,11 +62,13 @@ class EditFilter(object):
         self.MIN_LEVENSHTEIN_RATIO = edit_ratio_min  # on token
 
     def filter_edits(self, old_text, new_text):
-        log.debug("processing texts:  >>> %s  >>> %s", old_text, new_text)
+        # log.debug("processing texts:  >>> %s  >>> %s", old_text, new_text)
+
         if not self.__looks_like_text_edition(old_text, new_text):
             return []
 
         edits = []
+
         for old_sent, new_sent in self.__sentence_pairs(old_text, new_text):
             old_sent = old_sent.strip()
             new_sent = new_sent.strip()
@@ -70,7 +76,7 @@ class EditFilter(object):
             scores = self.__looks_like_sentence_edition(old_sent, new_sent)
             if not scores:
                 continue
-            log.debug("\tedit sentence:\n\told >>> %s\n\tnew >>> %s\nscores>>", old_sent, new_sent,scores)
+            # log.debug("\tedit sentence:\n\told >>> %s\n\tnew >>> %s\nscores>>", old_sent, new_sent,scores)
             edits.append((old_sent, new_sent, scores))
 
         log.info("got %i edited sentence(s)", len(edits))
@@ -92,7 +98,11 @@ class EditFilter(object):
 
         return True
 
-    def __looks_like_sentence_edition(self, old_sent, new_sent):
+    def __looks_like_sentence_edition(self, old_s, new_s):
+
+        old_sent = re.sub(r'(\d+)', '', old_s)
+        new_sent = re.sub(r'(\d+)', '', new_s)
+
         if old_sent == new_sent:
             log.info("sentences are equal")
             return False
@@ -143,9 +153,13 @@ class EditFilter(object):
     def __levenshtein_ratio(self, old_tokens, new_tokens):
         min_words_len = min(len(old_tokens), len(new_tokens))
 
-        dist = Levenshtein.distance(''.join(old_tokens), ''.join(new_tokens))
+        dist = custome_lev.jamo_levenshtein(''.join(old_tokens), ''.join(new_tokens))
+        # dist_norm = Levenshtein.distance(''.join(old_tokens), ''.join(new_tokens))
+        # dist = max(dist_jamo,dist_norm)
 
         ratio = dist / float(min_words_len) * math.log(min_words_len,
                                                        self.LEVENSHTEIN_RATIO_LOG_BASE)
+
+        # print("ratio : {} dist_jamo : {}, dist_norm : {}\nold_tokens >>> {}\nnew_tokens >>> {} ".format(ratio, dist_jamo,dist_norm, old_tokens, new_tokens))
 
         return (ratio, dist)

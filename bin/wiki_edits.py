@@ -35,6 +35,7 @@ def main():
                              min_chars=args.min_chars,
                              )
 
+
     if args.tabify:
         output = "{old}\t{new}"
         if args.scores:
@@ -48,6 +49,8 @@ def main():
                    + output
 
     out = args.output
+
+    print(input_p, out)
 
     if args.output != sys.stdout:
         out = open(args.output, 'w', encoding='utf-8')
@@ -99,33 +102,35 @@ def parse_user_args():
     group.add_argument("-l", "--language", default="korean",
                        help="specify language of NLTK sentence splitter",
                        choices=LANGUAGES)
-    group.add_argument("--min-chars", type=int, default=10,
+    group.add_argument("--min-chars", type=int, default=12,
                        help="set the minimum number of characters in a " \
                             "sentence")
-    group.add_argument("--min-words", type=int, default=2,
+    group.add_argument("--min-words", type=int, default=4,
                        help="set minimum length of sentence in words")
-    group.add_argument("--max-words", type=int, default=120,
+    group.add_argument("--max-words", type=int, default=60,
                        help="set maximum length of sentence in words")
     group.add_argument("--length-diff", type=int, default=4,
                        help="set maximum difference in length between " \
                             "edited sentences")
-    group.add_argument("--edit-ratio-max", type=float, default=0.3,
+    group.add_argument("--edit-ratio-max", type=float, default=0.20,
                        help="set maximum relative difference in edit " \
                             "distance")
-    group.add_argument("--edit-ratio-min", type=float, default=0.0001,
+    group.add_argument("--edit-ratio-min", type=float, default=0.01,
                        help="set maximum relative difference in edit " \
                             "distance")
-    group.add_argument('--default-output', default='wikiedit-{}.out'.format(dt.strftime('%Y-%m-%d-%X')),
+    group.add_argument('--default-output', default='wikiedit-{}.out'.format(dt.strftime('%Y-%m-%d-%H:%M:%S')),
                        help='make output to default output'
                        )
 
     args = parser.parse_args()
+
     if args.input == "<STDIN>":
         args.input = sys.stdin
     if args.output == "<STDOUT>":
         args.output = sys.stdout
     if args.default_output :
         args.output = args.default_output
+
     return args
 
 def set_logging_level(log_level):
