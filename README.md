@@ -1,4 +1,5 @@
 Wiki Korean Edits
+------------------
 
 This repository is based on [WikiEdit 2.0.](https://github.com/snukky/wikiedits)
 Added korean character level levenshtein distance and heuristic to find out valid edits from wiki edit history.
