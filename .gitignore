@@ -36,6 +36,13 @@ pip-delete-this-directory.txt
 nosetests.xml
 coverage.xml
 
+# local configs and tmps
+.DS_Store
+*tmp*
+*.csv
+.idea/*
+
 # data or outputs
 *.xml
 *.out
+*.gz

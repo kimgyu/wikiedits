@@ -1,4 +1,9 @@
-Wiki Edits 2.0
+Wiki Korean Edits
+
+This repository is based on [WikiEdit 2.0.](https://github.com/snukky/wikiedits)
+Added korean character level levenshtein distance and heuristic to find out valid edits from wiki edit history.
+default language is set to 'korean' so if you want to change , use -l option when run wiki_edit.py
+
 ==============
 
 A collection of scripts for automatic extraction of edited sentences from text
@@ -20,11 +25,12 @@ Error Corpus --- a corpus of corrective Wikipedia edits published in:
 WikEd Error Corpus
 ------------------
 
-The corpus has been prepared for two languages:
+The corpus has been prepared for languages:
 
 * English: [wiked-v1.0.en.tgz](http://data.statmt.org/romang/wiked/wiked-v1.0.en.tgz), 4.2 GB
 * English, cleaned & preprocessed: [wiked-v1.0.en.prepro.tgz](http://data.statmt.org/romang/wiked/wiked-v1.0.en.prepro.tgz), 2.0 GB
 * Polish: [wiked-v1.0.pl.tgz](http://data.statmt.org/romang/wiked/wiked-v1.0.pl.tgz), 301 MB
+* Korean : [kowiki-20190901-pages-meta-history](https://dumps.wikimedia.org/kowiki/20200901/kowiki-20200901-pages-meta-history1.xml-p1p16391.7z), 236 MB
 
 The repository also includes format conversion scripts for WikEd. The scripts
 work independently form Wiki Edits and can be found in the `bin` directory.
@@ -69,6 +75,7 @@ To extract edits from parallel texts:
 And from a Wikipedia dump file:
 
     zcat tests/data/enwiki-20140102.tiny.xml.gz | ./bin/wiki_edits.py
+    cat {YOUR_XML_DATA_PATH} | ./bin/wiki_edits.py
 
 The last script extracts edits from a list of dump files or URLs:
 
@@ -85,5 +92,7 @@ updated to run the scripts for non-English languages:
 - regular expressions for filtering reverted revisions in file:
   `wikiedits/wiki/__init__.py`
 - list of supported languages in file: `wikiedits/__init__.py`
+- used [Korean BERT Sentences piece](https://github.com/SKTBrain/KoBERT) for tokenizing korean words
+  desc : kobert sentence piece
 
-Currently supported languages: English, Polish, German.
+Currently supported languages: English, Polish, German, Korean
