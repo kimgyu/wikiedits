@@ -93,6 +93,5 @@ updated to run the scripts for non-English languages:
   `wikiedits/wiki/__init__.py`
 - list of supported languages in file: `wikiedits/__init__.py`
 - used [Korean BERT Sentences piece](https://github.com/SKTBrain/KoBERT) for tokenizing korean words
-  desc : kobert sentence piece
 
 Currently supported languages: English, Polish, German, Korean
